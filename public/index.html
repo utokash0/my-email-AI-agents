@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Agency System</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f1f5f9;--card:#fff;--border:#e2e8f0;--text:#0f172a;--muted:#64748b;
+  --sidebar:#0f172a;--sidebar-t:#94a3b8;
+  --accent:#7c3aed;--accent-l:#ede9fe;--accent-d:#6d28d9;
+  --blue:#2563eb;--blue-l:#dbeafe;
+  --green:#059669;--green-l:#d1fae5;
+  --amber:#d97706;--amber-l:#fef3c7;
+  --red:#dc2626;--red-l:#fee2e2;
+  --teal:#0f766e;--teal-l:#ccfbf1;
+  --r:10px;--hh:60px;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* ── HEADER ── */
+#header{position:sticky;top:0;z-index:50;height:var(--hh);background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:16px}
+#header.hidden{display:none}
+.hd-logo{display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0}
+.hd-logo-icon{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+.hd-logo-text{font-size:14px;font-weight:700;color:var(--text)}
+.hd-breadcrumb{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);flex:1;min-width:0}
+.hd-breadcrumb span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hd-breadcrumb .sep{color:var(--border);flex-shrink:0}
+.hd-breadcrumb .active{color:var(--text);font-weight:500}
+.hd-search{display:flex;align-items:center;gap:8px;background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:6px 12px;width:220px;transition:border .15s}
+.hd-search:focus-within{border-color:var(--accent)}
+.hd-search input{border:none;background:transparent;font-size:13px;color:var(--text);outline:none;width:100%}
+.hd-search input::placeholder{color:var(--muted)}
+.hd-right{display:flex;align-items:center;gap:10px;margin-left:auto;flex-shrink:0}
+.hd-user{display:flex;align-items:center;gap:8px;font-size:13px}
+.hd-avatar{width:32px;height:32px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.hd-name{font-weight:500;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hd-role{font-size:10px;font-weight:700;padding:1px 7px;border-radius:8px}
+.role-admin{background:var(--accent-l);color:var(--accent)}
+.role-member{background:var(--blue-l);color:var(--blue)}
+.hd-btn{padding:6px 14px;border-radius:7px;border:1.5px solid var(--border);background:#fff;font-size:12px;font-weight:600;cursor:pointer;color:var(--muted);transition:all .15s}
+.hd-btn:hover{border-color:var(--red);color:var(--red)}
+.hd-menu-btn{display:none;background:none;border:none;font-size:20px;cursor:pointer;padding:4px;color:var(--text)}
+
+/* ── PAGES ── */
+.page{display:none;min-height:calc(100vh - var(--hh))}
+.page.active{display:block}
+#pg-login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#312e81 100%)}
+#pg-login.active{display:flex}
+
+/* ── LOGIN ── */
+.login-wrap{width:420px;max-width:calc(100vw - 32px)}
+.login-logo{text-align:center;margin-bottom:28px}
+.login-logo-icon{width:56px;height:56px;background:var(--accent);border-radius:14px;display:inline-flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:12px}
+.login-logo h1{font-size:22px;font-weight:700;color:#fff}
+.login-logo p{font-size:13px;color:#94a3b8;margin-top:4px}
+.login-card{background:#fff;border-radius:14px;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.login-tabs{display:flex;background:var(--bg);border-radius:8px;padding:3px;margin-bottom:20px}
+.login-tab{flex:1;padding:7px;text-align:center;font-size:13px;font-weight:600;border-radius:6px;cursor:pointer;color:var(--muted);transition:all .15s;border:none;background:none}
+.login-tab.active{background:#fff;color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.12)}
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+label{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+input,select,textarea{padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:inherit;color:var(--text);background:#fff;transition:border .15s;outline:none;width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+textarea{resize:vertical;min-height:68px}
+.btn{padding:10px 18px;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;justify-content:center}
+.btn-primary{background:var(--accent);color:#fff;width:100%;padding:12px}.btn-primary:hover{background:var(--accent-d)}
+.btn-secondary{background:#fff;color:var(--text);border:1.5px solid var(--border)}.btn-secondary:hover{background:var(--bg)}
+.btn-green{background:var(--green);color:#fff}.btn-green:hover{background:#047857}
+.btn-red{background:var(--red);color:#fff}.btn-red:hover{background:#b91c1c}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.login-err{color:var(--red);font-size:12px;margin-top:8px;text-align:center;min-height:18px}
+
+/* ── FIELDS PAGE ── */
+#pg-fields{display:flex;align-items:center;justify-content:center;padding:40px 20px}
+#pg-fields.active{display:flex}
+.fields-wrap{max-width:680px;width:100%}
+.fields-greeting{margin-bottom:28px}
+.fields-greeting h2{font-size:24px;font-weight:700}
+.fields-greeting p{font-size:14px;color:var(--muted);margin-top:4px}
+.fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.field-card{background:var(--card);border:2px solid var(--border);border-radius:14px;padding:24px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.field-card.active-field:hover{border-color:var(--accent);box-shadow:0 4px 20px rgba(124,58,237,.15);transform:translateY(-2px)}
+.field-card.coming-soon{opacity:.65;cursor:default}
+.field-card-icon{font-size:36px;margin-bottom:12px}
+.field-card h3{font-size:16px;font-weight:700;margin-bottom:6px}
+.field-card p{font-size:13px;color:var(--muted);line-height:1.55}
+.field-badge{position:absolute;top:14px;right:14px;font-size:10px;font-weight:700;padding:2px 10px;border-radius:10px}
+.badge-active{background:var(--green-l);color:var(--green)}
+.badge-soon{background:var(--amber-l);color:var(--amber)}
+
+/* ── PROJECTS PAGE ── */
+#pg-projects{display:flex}
+#pg-projects.active{display:flex}
+.sidebar{width:220px;min-width:220px;background:var(--sidebar);min-height:calc(100vh - var(--hh));display:flex;flex-direction:column;padding:16px 0;transition:transform .25s}
+.sb-section{padding:12px 16px 6px;font-size:10px;font-weight:700;color:#475569;letter-spacing:.08em;text-transform:uppercase}
+.sb-item{display:flex;align-items:center;gap:8px;padding:9px 16px;cursor:pointer;color:var(--sidebar-t);font-size:13px;border-left:3px solid transparent;transition:all .15s}
+.sb-item:hover{background:#1e293b;color:#fff}
+.sb-item.active{background:#1e1b4b;color:#fff;border-left-color:var(--accent)}
+.sb-dot{width:7px;height:7px;border-radius:50%;background:#334155;flex-shrink:0}
+.sb-item.active .sb-dot{background:var(--accent)}
+.sb-info{flex:1;min-width:0}
+.sb-name{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-meta{font-size:10px;color:#64748b;margin-top:1px}
+.sb-divider{height:1px;background:#1e293b;margin:8px 0}
+.sb-action{display:flex;align-items:center;gap:8px;padding:8px 16px;cursor:pointer;color:#64748b;font-size:12px;transition:all .15s}
+.sb-action:hover{color:#94a3b8}
+.main-area{flex:1;overflow-y:auto;padding:24px}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:12px;flex-wrap:wrap}
+.page-header h2{font-size:20px;font-weight:700}
+.page-header p{font-size:13px;color:var(--muted);margin-top:2px}
+.search-box{display:flex;align-items:center;gap:8px;background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:8px 12px;width:220px;transition:border .15s}
+.search-box:focus-within{border-color:var(--accent)}
+.search-box input{border:none;background:transparent;font-size:13px;outline:none;color:var(--text);width:100%}
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+.proj-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--r);padding:18px;cursor:pointer;transition:all .18s}
+.proj-card:hover{border-color:var(--accent);box-shadow:0 2px 12px rgba(124,58,237,.1)}
+.proj-card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:10px}
+.proj-brand{font-size:15px;font-weight:700}
+.proj-field-tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:8px;background:var(--accent-l);color:var(--accent)}
+.proj-name{font-size:12px;color:var(--muted);margin-bottom:10px}
+.proj-stats{display:flex;gap:12px;font-size:11px;color:var(--muted)}
+.proj-stat{display:flex;align-items:center;gap:4px}
+.empty-state{text-align:center;padding:60px 24px;color:var(--muted)}
+.empty-state .ei{font-size:48px;margin-bottom:14px}
+.empty-state h3{font-size:18px;color:var(--text);margin-bottom:6px}
+.empty-state p{font-size:13px;line-height:1.6;margin-bottom:20px}
+
+/* ── WORKSPACE ── */
+#pg-workspace{display:flex}
+#pg-workspace.active{display:flex}
+.ws-screen{display:none;flex-direction:column;gap:16px}
+.ws-screen.active{display:flex}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--r);padding:20px}
+.card-title{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+
+/* ── PROGRESS ── */
+.progress-list{display:flex;flex-direction:column;gap:8px}
+.step-item{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:8px;border:1px solid var(--border);background:#fff;transition:all .2s}
+.step-item.running{border-color:var(--accent);background:var(--accent-l)}
+.step-item.done{border-color:var(--green);background:var(--green-l)}
+.step-item.waiting{border-color:var(--teal);background:var(--teal-l)}
+.step-item.error{border-color:var(--red);background:var(--red-l)}
+.step-icon{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;background:var(--border);color:var(--muted)}
+.step-icon.running{background:var(--accent);color:#fff}
+.step-icon.done{background:var(--green);color:#fff}
+.step-icon.waiting{background:var(--teal);color:#fff}
+.step-icon.error{background:var(--red);color:#fff}
+.step-label{font-size:13px;font-weight:600;flex:1}
+.step-msg{font-size:11px;color:var(--muted);margin-top:2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin .8s linear infinite;display:inline-block}
+
+/* ── BADGES ── */
+.badge{font-size:10px;font-weight:700;padding:2px 9px;border-radius:10px;white-space:nowrap}
+.badge-purple{background:var(--accent-l);color:var(--accent)}
+.badge-green{background:var(--green-l);color:var(--green)}
+.badge-blue{background:var(--blue-l);color:var(--blue)}
+.badge-amber{background:var(--amber-l);color:var(--amber)}
+.badge-teal{background:var(--teal-l);color:var(--teal)}
+.badge-red{background:var(--red-l);color:var(--red)}
+
+/* ── CHECKPOINT BANNER ── */
+.cp-banner{background:var(--teal-l);border:2px dashed var(--teal);border-radius:10px;padding:16px 20px;display:flex;justify-content:space-between;align-items:center;gap:16px}
+.cp-banner h3{font-size:14px;font-weight:700;color:var(--teal)}
+.cp-banner p{font-size:12px;color:#134e4a;margin-top:3px;line-height:1.5}
+
+/* ── COMPARISON BOX ── */
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.compare-box{border-radius:10px;padding:14px 16px}
+.compare-box.initial{background:#fff7ed;border:1px solid #fed7aa}
+.compare-box h4{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.compare-box.initial h4{color:#c2410c}
+.compare-box.insight h4{color:var(--green)}
+.compare-box.insight{background:var(--green-l);border:1px solid #a7f3d0}
+.compare-subj{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px}
+.compare-body{font-size:12px;color:#374151;line-height:1.6;max-height:110px;overflow-y:auto;white-space:pre-wrap}
+
+/* ── COPY CARDS ── */
+.copy-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:8px}
+.copy-card{min-width:280px;max-width:300px;border:2px solid var(--border);border-radius:10px;padding:14px;cursor:pointer;transition:all .18s;background:#fff;flex-shrink:0}
+.copy-card:hover{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-l)}
+.copy-card.selected{border-color:var(--accent);background:var(--accent-l);box-shadow:0 0 0 3px var(--accent-l)}
+.copy-angle{font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em}
+.copy-score{font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--green-l);color:var(--green)}
+.copy-subject{font-size:13px;font-weight:700;color:var(--text);margin:6px 0 3px}
+.copy-preview{font-size:11px;color:var(--muted);margin-bottom:8px}
+.copy-body{font-size:11.5px;color:#374151;line-height:1.6;max-height:100px;overflow-y:auto;border-top:1px solid var(--border);padding-top:8px;white-space:pre-wrap}
+.copy-cta-tag{margin-top:8px;padding:5px 12px;background:var(--text);color:#fff;border-radius:5px;font-size:11px;font-weight:600;display:inline-block}
+.copy-why{margin-top:6px;font-size:11px;color:var(--green)}
+
+/* ── FORM GRID ── */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.fg.full{grid-column:1/-1}
+
+/* ── DESIGN ── */
+.design-layout{display:grid;grid-template-columns:1fr 300px;gap:16px;align-items:start}
+.email-frame{width:100%;height:500px;border:1px solid var(--border);border-radius:8px;background:#fff}
+.qa-score-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.qa-big{font-size:28px;font-weight:700}
+.qa-item{font-size:11px;padding:4px 8px;border-radius:5px;margin-bottom:4px}
+.qa-pass{background:var(--green-l);color:var(--green)}
+.qa-warn{background:var(--amber-l);color:var(--amber)}
+.qa-fail{background:var(--red-l);color:var(--red)}
+
+/* ── CODE BLOCK ── */
+.code-block{background:#0f172a;color:#e2e8f0;padding:14px 16px;border-radius:8px;font-family:'Courier New',monospace;font-size:11.5px;line-height:1.7;overflow:auto;white-space:pre;max-height:300px}
+
+/* ── COMPLETE SCREEN ── */
+.complete-hero{text-align:center;padding:40px 24px;background:#fff;border-radius:var(--r);border:1px solid var(--border)}
+.complete-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+
+/* ── HISTORY ── */
+.history-item{padding:10px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.history-item:last-child{border-bottom:none}
+.history-item b{font-size:13px}
+.history-item p{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* ── ADMIN PAGE ── */
+#pg-admin{padding:24px}
+#pg-admin.active{display:block}
+.admin-grid{display:grid;grid-template-columns:1fr 360px;gap:20px;align-items:start}
+.user-table{width:100%;border-collapse:collapse}
+.user-table th{text-align:left;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:10px 12px;background:var(--bg);border-bottom:1px solid var(--border)}
+.user-table td{padding:12px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
+.user-table tr:last-child td{border-bottom:none}
+.user-table tr:hover td{background:var(--bg)}
+
+/* ── MODAL ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:200;padding:16px}
+.overlay.open{display:flex}
+.modal{background:#fff;border-radius:14px;padding:24px;width:460px;max-width:100%;display:flex;flex-direction:column;gap:14px;max-height:90vh;overflow-y:auto}
+.modal h3{font-size:16px;font-weight:700}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:4px}
+
+/* ── MOBILE SIDEBAR OVERLAY ── */
+#mob-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:30}
+
+/* ── RESPONSIVE ── */
+@media(max-width:768px){
+  :root{--hh:56px}
+  .hd-breadcrumb{display:none}
+  .hd-search{display:none}
+  .hd-name{display:none}
+  .hd-menu-btn{display:flex}
+
+  .sidebar{position:fixed;left:0;top:var(--hh);height:calc(100vh - var(--hh));z-index:40;transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  #mob-overlay.show{display:block}
+
+  .main-area{padding:16px}
+  .fields-grid{grid-template-columns:1fr}
+  .form-grid{grid-template-columns:1fr}
+  .fg.full{grid-column:1}
+  .compare-grid{grid-template-columns:1fr}
+  .design-layout{grid-template-columns:1fr}
+  .email-frame{height:380px}
+  .admin-grid{grid-template-columns:1fr}
+  .proj-grid{grid-template-columns:1fr}
+  .copy-scroll{display:flex;flex-direction:column;overflow-x:visible}
+  .copy-card{min-width:unset;max-width:100%}
+  .page-header{flex-direction:column;align-items:flex-start}
+  .search-box{width:100%}
+  .hd-logo-text{font-size:13px}
+  .modal{border-radius:10px}
+  .cp-banner{flex-direction:column;align-items:flex-start}
+  .complete-actions{flex-direction:column}
+  .complete-actions .btn{width:100%}
+}
+@media(max-width:480px){
+  .login-wrap{width:100%}
+  .fields-wrap{padding:0 4px}
+}
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header id="header" class="hidden">
+  <button class="hd-menu-btn" onclick="toggleSidebar()" aria-label="Menu">☰</button>
+  <a class="hd-logo" href="#" onclick="goHome();return false">
+    <div class="hd-logo-icon">🤖</div>
+    <span class="hd-logo-text">AI Agency</span>
+  </a>
+  <div class="hd-breadcrumb" id="breadcrumb"></div>
+  <div class="hd-search" id="hd-search-box" style="display:none">
+    <span style="color:var(--muted);font-size:13px">🔍</span>
+    <input id="hd-search" placeholder="Search projects…" oninput="searchProjects(this.value)">
+  </div>
+  <div class="hd-right">
+    <div class="hd-user">
+      <div class="hd-avatar" id="hd-avatar">?</div>
+      <div>
+        <div class="hd-name" id="hd-name">—</div>
+        <div class="hd-role" id="hd-role"></div>
+      </div>
+    </div>
+    <button id="btn-admin" class="hd-btn" onclick="showAdmin()" style="display:none">⚙ Admin</button>
+    <button class="hd-btn" onclick="logout()">Sign out</button>
+  </div>
+</header>
+
+<div id="mob-overlay" onclick="closeSidebar()"></div>
+
+<!-- ═══════════════════════════════════════════════════ LOGIN ═══ -->
+<div id="pg-login" class="page active">
+  <div class="login-wrap">
+    <div class="login-logo">
+      <div class="login-logo-icon">🤖</div>
+      <h1>AI Agency System</h1>
+      <p>Your AI-powered email marketing workspace</p>
+    </div>
+    <div class="login-card">
+      <div class="login-tabs">
+        <button class="login-tab active" onclick="setLoginTab('admin',this)">Admin Login</button>
+        <button class="login-tab" onclick="setLoginTab('member',this)">Member Login</button>
+      </div>
+      <div class="fg"><label>Email Address</label><input id="l-email" type="email" placeholder="your@email.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="fg"><label>Password</label><input id="l-pass" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="btn btn-primary" onclick="doLogin()" id="btn-login">Sign In</button>
+      <div class="login-err" id="login-err"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ FIELDS ═══ -->
+<div id="pg-fields" class="page">
+  <div class="fields-wrap">
+    <div class="fields-greeting">
+      <h2 id="fields-greeting">What would you like to work on?</h2>
+      <p>Choose your workspace below</p>
+    </div>
+    <div class="fields-grid" id="fields-grid">
+      <!-- rendered by JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ PROJECTS ═══ -->
+<div id="pg-projects" class="page">
+  <div class="sidebar" id="proj-sidebar">
+    <div class="sb-section">Workspace</div>
+    <div class="sb-item" onclick="goHome()">
+      <span>🏠</span><div class="sb-info"><div class="sb-name">All Fields</div></div>
+    </div>
+    <div class="sb-divider"></div>
+    <div class="sb-section">Recent Projects</div>
+    <div id="sb-proj-list"></div>
+    <div class="sb-divider"></div>
+    <div class="sb-action" onclick="openNewProject()">＋ New Project</div>
+  </div>
+  <div class="main-area">
+    <div class="page-header">
+      <div><h2 id="proj-field-name">Projects</h2><p id="proj-field-desc"></p></div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+        <div class="search-box" id="proj-search-box">
+          <span style="color:var(--muted)">🔍</span>
+          <input id="proj-search" placeholder="Search projects…" oninput="searchProjects(this.value)">
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="openNewProject()">+ New Project</button>
+      </div>
+    </div>
+    <div class="proj-grid" id="proj-grid">
+      <div class="empty-state"><div class="ei">📁</div><h3>No projects yet</h3><p>Create your first project to get started.</p><button class="btn btn-primary btn-sm" onclick="openNewProject()">+ New Project</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ WORKSPACE ═══ -->
+<div id="pg-workspace" class="page">
+  <div class="sidebar" id="ws-sidebar">
+    <div class="sb-section">Navigation</div>
+    <div class="sb-item" onclick="goBack()"><span>←</span><div class="sb-info"><div class="sb-name">Back to Projects</div></div></div>
+    <div class="sb-divider"></div>
+    <div class="sb-section">Project</div>
+    <div class="sb-item active" id="sb-project-name"><div class="sb-dot"></div><div class="sb-info"><div class="sb-name" id="ws-brand-name">—</div><div class="sb-meta" id="ws-proj-name">—</div></div></div>
+    <div class="sb-divider"></div>
+    <div class="sb-section">Campaigns</div>
+    <div id="sb-camp-list"></div>
+    <div class="sb-action" onclick="wsShow('campaign')">＋ New Campaign</div>
+  </div>
+  <div class="main-area">
+
+    <!-- DASHBOARD -->
+    <div class="ws-screen active" id="ws-dashboard">
+      <div class="page-header">
+        <div><h2 id="ws-db-brand">Brand</h2><p id="ws-db-meta">—</p></div>
+        <button class="btn btn-primary btn-sm" onclick="wsShow('campaign')">+ New Campaign</button>
+      </div>
+      <div class="card">
+        <div class="card-title">Campaign History</div>
+        <div id="ws-history"><p style="font-size:13px;color:var(--muted)">No campaigns yet.</p></div>
+      </div>
+    </div>
+
+    <!-- CAMPAIGN FORM -->
+    <div class="ws-screen" id="ws-campaign">
+      <div class="page-header">
+        <div><h2>New Campaign</h2><p id="ws-camp-proj">—</p></div>
+        <button class="btn btn-secondary btn-sm" onclick="wsShow('dashboard')">← Back</button>
+      </div>
+      <div class="card">
+        <div class="card-title">🎯 Campaign Details</div>
+        <div class="form-grid">
+          <div class="fg"><label>Brand Website URL</label><input id="f-url" type="url" placeholder="https://yourbrand.com"></div>
+          <div class="fg"><label>Email Type</label><select id="f-type"><option value="promotional">Promotional / Sale</option><option value="welcome">Welcome Series</option><option value="abandoned_cart">Abandoned Cart</option><option value="winback">Win-Back</option><option value="announcement">Product Launch</option><option value="newsletter">Newsletter</option></select></div>
+          <div class="fg full"><label>Product / Offer Focus</label><input id="f-product" placeholder="e.g. Organic face serum — 30% off launch offer"></div>
+          <div class="fg full"><label>Campaign Goal</label><input id="f-goal" placeholder="e.g. Drive first purchase with 20% off, code GLOW20"></div>
+          <div class="fg full"><label>Target Audience (US)</label><input id="f-audience" placeholder="e.g. US women 25–45 interested in clean beauty"></div>
+          <div class="fg"><label>Offer / Discount</label><input id="f-offer" placeholder="e.g. 20% off, free shipping"></div>
+          <div class="fg"><label>CTA Button Text</label><input id="f-cta" placeholder="e.g. Get My 20% Off"></div>
+          <div class="fg"><label>Brand Tone</label><input id="f-tone" placeholder="e.g. warm, playful, premium"></div>
+          <div class="fg"><label>Urgency Level</label><select id="f-urgency"><option value="high">High — strong deadline</option><option value="medium" selected>Medium — soft urgency</option><option value="low">Low — no pressure</option></select></div>
+          <div class="fg full"><label>Winning Meta Ads (paste copy or describe the angle)</label><textarea id="f-meta" placeholder="Paste your best performing Meta ad copy here…"></textarea></div>
+          <div class="fg full"><label>Constraints / Things to Avoid</label><textarea id="f-constraints" placeholder="e.g. No before/after claims, avoid 'anti-aging'" style="min-height:56px"></textarea></div>
+          <div class="fg full"><label>Additional Notes</label><textarea id="f-notes" placeholder="Seasonal angle, competitor reference, hook idea…" style="min-height:56px"></textarea></div>
+        </div>
+        <div style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
+          <button class="btn btn-primary" onclick="runWorkflow()">🚀 Run All Agents</button>
+          <button class="btn btn-secondary" onclick="wsShow('dashboard')">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RUNNING -->
+    <div class="ws-screen" id="ws-running">
+      <div class="page-header"><div><h2>Agents Running</h2><p>Deep research + copy writing in progress. Takes 3–5 minutes.</p></div></div>
+      <div class="card"><div class="card-title">Live Progress</div><div class="progress-list" id="run-progress"></div></div>
+    </div>
+
+    <!-- CHECKPOINT 1 — copy + comparison -->
+    <div class="ws-screen" id="ws-cp1">
+      <div class="cp-banner">
+        <div><h3>Checkpoint 1 — Review Your Copy</h3><p>Initial draft vs research-informed versions. Pick one to design.</p></div>
+        <span class="badge badge-teal">YOUR TURN</span>
+      </div>
+      <!-- Comparison -->
+      <div class="card">
+        <div class="card-title">Before vs After Research</div>
+        <div class="compare-grid">
+          <div class="compare-box initial">
+            <h4>Initial Draft (before research)</h4>
+            <div class="compare-subj" id="cp1-init-subj">—</div>
+            <div class="compare-body" id="cp1-init-body">—</div>
+          </div>
+          <div class="compare-box insight">
+            <h4>What Research Revealed</h4>
+            <p style="font-size:12px;color:#065f46;line-height:1.55" id="cp1-insight">—</p>
+            <p style="font-size:11px;color:#047857;margin-top:6px"><b>Language upgrade:</b> <span id="cp1-lang"></span></p>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);background:var(--bg);padding:10px 12px;border-radius:6px" id="cp1-research-summary"></div>
+      </div>
+      <!-- 5 variations -->
+      <div class="card">
+        <div class="card-title">5 Research-Informed Variations — Select One</div>
+        <div class="copy-scroll" id="cp1-copies"></div>
+        <div style="margin-top:14px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button class="btn btn-primary" id="btn-design" onclick="proceedToDesign()" disabled>Generate Email Design →</button>
+          <button class="btn btn-secondary" onclick="requestRevision('copy')">Request Copy Revision</button>
+          <span id="cp1-hint" style="font-size:12px;color:var(--muted)">Select a variation above</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- DESIGNING -->
+    <div class="ws-screen" id="ws-designing">
+      <div class="page-header"><div><h2>Designer Agent Running</h2><p>Creating your Klaviyo email design…</p></div></div>
+      <div class="card"><div class="card-title">Progress</div><div class="progress-list" id="design-progress"></div></div>
+    </div>
+
+    <!-- CHECKPOINT 2 — design review -->
+    <div class="ws-screen" id="ws-cp2">
+      <div class="cp-banner">
+        <div><h3>Checkpoint 2 — Review Email Design</h3><p>QA agent checked everything. Approve to export.</p></div>
+        <span class="badge badge-green">FINAL STEP</span>
+      </div>
+      <div class="design-layout">
+        <div class="card" style="padding:14px"><div class="card-title" style="margin-bottom:8px">Email Preview</div><iframe id="email-frame" class="email-frame" title="Email preview"></iframe></div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="card">
+            <div class="card-title" style="font-size:13px">QA Report</div>
+            <div id="qa-score"></div><div id="qa-items" style="margin-top:8px"></div>
+          </div>
+          <div class="card">
+            <div class="card-title" style="font-size:13px">Actions</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <button class="btn btn-green" onclick="approveExport()">✓ Approve & Export</button>
+              <button class="btn btn-secondary" onclick="copyHTML()">Copy HTML Code</button>
+              <button class="btn btn-secondary" onclick="downloadHTML()">Download .html File</button>
+              <button class="btn btn-secondary btn-sm" onclick="requestRevision('design')">Request Design Changes</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- COMPLETE -->
+    <div class="ws-screen" id="ws-complete">
+      <div class="complete-hero">
+        <div style="font-size:48px;margin-bottom:14px">🎉</div>
+        <h2 style="font-size:20px;margin-bottom:8px">Campaign Complete!</h2>
+        <p style="font-size:13px;color:var(--muted);line-height:1.6">Your Klaviyo email is ready.<br>Copy the HTML and paste it into Klaviyo's template builder.</p>
+        <div class="complete-actions">
+          <button class="btn btn-primary" onclick="copyHTML()">Copy HTML for Klaviyo</button>
+          <button class="btn btn-secondary" onclick="downloadHTML()">Download .html</button>
+          <button class="btn btn-secondary" onclick="wsShow('campaign')">+ New Campaign</button>
+        </div>
+      </div>
+      <div class="card"><div class="card-title">Final HTML Code</div><div class="code-block" id="final-html"></div></div>
+    </div>
+
+  </div><!-- end main-area -->
+</div><!-- end pg-workspace -->
+
+<!-- ═══════════════════════════════════════════════════ ADMIN ═══ -->
+<div id="pg-admin" class="page">
+  <div style="max-width:1100px;margin:0 auto;padding:24px">
+    <div class="page-header" style="margin-bottom:20px">
+      <div><h2>Admin Panel</h2><p>Manage team members and field access</p></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-primary btn-sm" onclick="openAddMember()">+ Add Member</button>
+        <button class="btn btn-secondary btn-sm" onclick="showPage('pg-fields')">← Back</button>
+      </div>
+    </div>
+    <div class="admin-grid">
+      <div class="card">
+        <div class="card-title">Team Members</div>
+        <div style="overflow-x:auto">
+          <table class="user-table" id="user-table">
+            <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Fields</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="user-tbody"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Quick Stats</div>
+        <div id="admin-stats" style="display:flex;flex-direction:column;gap:12px"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════ MODALS ═══ -->
+
+<!-- New Project -->
+<div class="overlay" id="modal-project">
+  <div class="modal">
+    <h3>Create New Project</h3>
+    <div class="fg"><label>Project Name</label><input id="mp-name" placeholder="e.g. GlowSkin Q3 Campaigns"></div>
+    <div class="fg"><label>Brand Name</label><input id="mp-brand" placeholder="e.g. GlowSkin"></div>
+    <div class="fg"><label>Niche / Audience</label><input id="mp-niche" placeholder="e.g. Clean beauty, US women 25–45"></div>
+    <div class="fg"><label>Goals</label><textarea id="mp-goals" placeholder="e.g. Drive first purchases, grow email list, launch new product"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-project')">Cancel</button>
+      <button class="btn btn-primary" onclick="createProject()" style="width:auto">Create Project</button>
+    </div>
+  </div>
+</div>
+
+<!-- Add Member (admin) -->
+<div class="overlay" id="modal-member">
+  <div class="modal">
+    <h3>Add Team Member</h3>
+    <div class="fg"><label>Full Name</label><input id="mm-name" placeholder="e.g. Sarah Ahmed"></div>
+    <div class="fg"><label>Email Address</label><input id="mm-email" type="email" placeholder="sarah@youragency.com"></div>
+    <div class="fg"><label>Password</label><input id="mm-pass" type="password" placeholder="Minimum 8 characters"></div>
+    <div class="fg"><label>Field Access</label><div id="mm-fields" style="display:flex;flex-direction:column;gap:6px;margin-top:4px"></div></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-member')">Cancel</button>
+      <button class="btn btn-primary" onclick="addMember()" style="width:auto">Add Member</button>
+    </div>
+  </div>
+</div>
+
+<!-- Revision Request -->
+<div class="overlay" id="modal-revision">
+  <div class="modal">
+    <h3 id="rev-title">Request Changes</h3>
+    <p style="font-size:13px;color:var(--muted)">Describe exactly what you want changed. The agent will re-run with your feedback.</p>
+    <div class="fg" style="margin-top:4px"><label>Your Feedback</label><textarea id="rev-feedback" placeholder="e.g. Make the subject line more urgent, and change the CTA to say 'Claim My 20% Off'"></textarea></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('modal-revision')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitRevision()" style="width:auto">Submit & Re-run</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

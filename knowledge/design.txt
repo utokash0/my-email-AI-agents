@@ -1,0 +1,157 @@
+================================================================
+EMAIL DESIGN KNOWLEDGE BASE
+AI Email Agent System — Designer Agent Reference
+================================================================
+
+SECTION 1: KLAVIYO EMAIL SPECIFICATIONS
+================================================================
+Max width:        600px (never wider — breaks in Outlook)
+Mobile breakpoint: 480px
+Safe image width: 600px (full), 300px (half), 200px (third)
+Font sizes:
+  - Headline:  24–32px
+  - Subhead:   18–22px
+  - Body text: 15–16px (min 14px)
+  - Fine print: 12px
+Line height:    1.5–1.7 for body text
+Button height:  44px minimum (touch target)
+Button width:   minimum 160px, max 300px
+
+SECTION 2: LAYOUT RULES
+================================================================
+- Always single column. Multi-column breaks on mobile.
+- Header: brand logo centered or left-aligned, 80-120px tall max
+- Hero image: 600px wide, max 400px tall (aspect ratio 3:2 or 2:1)
+- Body sections: 20-40px padding on all sides
+- CTA button: centered, high contrast, 44px+ height
+- Footer: unsubscribe link MANDATORY, address, social icons optional
+- White space is not wasted space — use it generously
+
+SECTION 3: COLOR PRINCIPLES
+================================================================
+- One primary brand color (CTA button, headlines)
+- One secondary (accents, dividers)
+- Background: white (#ffffff) or very light grey (#f8f8f8)
+- Body text: dark grey (#333333) — never pure black on email
+- CTA button: high contrast to background. If background is white, button can be dark.
+- Use color to draw eye to the CTA — it should be the most saturated element
+
+SECTION 4: TYPOGRAPHY FOR EMAIL
+================================================================
+Web-safe fonts ONLY (not Google Fonts — email clients don't load them):
+  - Arial, Helvetica (clean, modern)
+  - Georgia (elegant, trustworthy)
+  - Times New Roman (traditional)
+  - Trebuchet MS (friendly, approachable)
+  - Verdana (highly readable on screen)
+
+Font weight: Bold for headlines, regular for body. No light (300) weights.
+Text alignment: Left-align body text. Center headlines and CTA only.
+
+SECTION 5: IMAGES IN EMAIL
+================================================================
+- Always include alt text — 40% of users read with images off
+- Never put critical information in images only (also write it as text)
+- Use JPG for photos (smaller file size), PNG for logos/icons (transparency)
+- Max image file size: 1MB (ideally under 500KB)
+- Never use background images — Outlook ignores them
+- Product images: show product clearly on white or neutral background
+- Lifestyle images: show product in use, with people the audience identifies with
+
+SECTION 6: CTA BUTTON CODE
+================================================================
+Best practice HTML button (works in all email clients):
+<table width="100%" cellpadding="0" cellspacing="0">
+  <tr>
+    <td align="center" style="padding: 24px 0;">
+      <a href="{{url}}"
+         style="background-color: #000000;
+                color: #ffffff;
+                font-family: Arial, sans-serif;
+                font-size: 16px;
+                font-weight: bold;
+                text-decoration: none;
+                padding: 14px 32px;
+                border-radius: 4px;
+                display: inline-block;">
+        Shop Now
+      </a>
+    </td>
+  </tr>
+</table>
+
+SECTION 7: KLAVIYO MERGE TAGS
+================================================================
+{{ first_name|default:"there" }}     — personalized greeting with fallback
+{{ email }}                          — subscriber email
+{{ unsubscribe_link }}               — MANDATORY in footer
+{{ organization.name }}              — brand name
+{{ organization.website }}           — brand website
+{{ organization.city }}              — location
+{{ organization.street_address }}    — address (required by CAN-SPAM)
+
+SECTION 8: COMMON EMAIL SECTIONS (IN ORDER)
+================================================================
+1. PREHEADER (hidden, sets preview text)
+2. HEADER (logo + optional nav)
+3. HERO (headline + subheadline + hero image)
+4. BODY (product benefit, social proof, offer details)
+5. CTA SECTION (button, centered, repeated if long email)
+6. SECONDARY OFFER (optional — related products, bonus offer)
+7. SOCIAL PROOF (reviews, press logos, testimonials)
+8. FOOTER (unsubscribe, address, social icons, copyright)
+
+SECTION 9: MOBILE OPTIMIZATION (NON-NEGOTIABLE)
+================================================================
+- All images: width="100%" style="max-width:600px"
+- Tables: width="100%" for all main containers
+- Use media queries to stack multi-column sections
+- Min font size 14px (iOS auto-zooms anything smaller)
+- CTA button full width on mobile: width: 100%; display: block;
+- Padding: 20px+ on left and right on mobile (prevents edge clipping)
+
+SECTION 10: SPAM AVOIDANCE IN DESIGN
+================================================================
+- Text-to-image ratio: at least 60% text, max 40% images
+- Never send an email that is one giant image
+- Include a plain-text version (Klaviyo handles this)
+- Avoid red text (spam trigger for some filters)
+- Include brand logo + address (builds sender reputation)
+- Physical address required by CAN-SPAM law
+
+SECTION 11: EMAIL TYPES — DESIGN PATTERNS
+================================================================
+PROMOTIONAL:
+  - Bold hero with offer prominently above the fold
+  - Price + discount displayed as crossed-out vs new price
+  - Countdown timer (Klaviyo supports this natively)
+  - Multiple CTAs are okay if multiple products/offers
+
+WELCOME:
+  - Warm, brand-focused design
+  - Brand story above the fold, offer below
+  - Softer colors, less urgency
+  - Can be 20-30% longer than promotional
+
+ABANDONED CART:
+  - Show EXACT product they left (image + name + price)
+  - Simple, focused — one product, one CTA
+  - Social proof near the CTA (reviews for that product)
+  - Urgency element if stock is limited
+
+WIN-BACK:
+  - Less promotional, more conversational design
+  - "We miss you" tone translates to warmer, softer design
+  - Single column, limited imagery
+  - New product imagery helps show what they've missed
+
+================================================================
+ADD YOUR OWN DESIGN RULES BELOW
+================================================================
+(Add brand color palettes, font choices, design system notes here)
+
+[YOUR DESIGN NOTES GO HERE]
+
+================================================================
+END OF DESIGN KNOWLEDGE BASE
+================================================================
